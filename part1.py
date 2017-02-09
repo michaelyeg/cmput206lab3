@@ -48,6 +48,7 @@ def main():
     img = image("ex2.jpg")
     img.sobel()
     img.display()
+    return
 
 if __name__ == "__main__":
     main()
