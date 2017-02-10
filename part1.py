@@ -6,18 +6,8 @@ class image:
     def __init__(self, filename):
         self.image = cv2.imread(filename, 0)
         self.filtered = []
-        #self.height = 0
-        #self.width = 0
         self.Gx = []
         self.Gy = []
-        #self.getdimension()
-
-    # Get image dimension (Height and Width)
-    def getdimension(self):
-        dimension = self.image.shape
-        self.height = dimension[0]
-        self.width = dimension[1]
-        return
 
     def sobel(self):
         # Formula extracted from https://en.wikipedia.org/wiki/Sobel_operator
@@ -28,17 +18,17 @@ class image:
         self.Gx = cv2.filter2D(self.image, -1, Kx)
         self.Gy = cv2.filter2D(self.image, -1, Ky)
 
-        self.filtered = cv2.addWeighted(self.Gx, 0.5, self.Gy, 0.5, 0.0)
+        self.filtered = cv2.add(self.Gx, self.Gy)
         return
 
     def display(self):
-        plt.subplot(221), plt.imshow(self.image), plt.title('Before')
+        plt.subplot(221), plt.imshow(self.image, 'gray'), plt.title('Before')
         plt.xticks([]), plt.yticks([])
-        plt.subplot(222), plt.imshow(self.Gx), plt.title('Horizontal')
+        plt.subplot(222), plt.imshow(self.Gx, 'gray'), plt.title('Horizontal')
         plt.xticks([]), plt.yticks([])
-        plt.subplot(223), plt.imshow(self.Gy), plt.title('Vertical')
+        plt.subplot(223), plt.imshow(self.Gy, 'gray'), plt.title('Vertical')
         plt.xticks([]), plt.yticks([])
-        plt.subplot(224), plt.imshow(self.filtered), plt.title('After')
+        plt.subplot(224), plt.imshow(self.filtered, 'gray'), plt.title('After')
         plt.xticks([]), plt.yticks([])
         plt.show()
         return
