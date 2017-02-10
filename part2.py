@@ -23,5 +23,5 @@ while True:
     # Press ESC to quit
     k = cv2.waitKey(1) & 0xFF
     if k == 27:
-       break
+        break
 cv2.destroyAllWindows()
