@@ -1,5 +1,4 @@
 import cv2, math
-from matplotlib import pyplot as plt
 
 
 class image:
@@ -8,8 +7,6 @@ class image:
         self.filtered = []
         self.height = 0
         self.width = 0
-        # Use the switch to identify if self.gaussianfilter() has been called before
-        self.switch = 0
         self.getdimension()
         # Standard Deviation of the image
         self.stdDev = self.getstdDev()
@@ -27,11 +24,7 @@ class image:
 
     # Apply gaussianfilter
     def gaussianfilter(self):
-        if self.switch == 0:
-            self.filtered = cv2.GaussianBlur(self.image, (5, 5), 0)
-            self.switch = 1
-        else:
-            self.filtered = cv2.GaussianBlur(self.filtered, (5, 5), 0)
+        self.filtered = cv2.GaussianBlur(self.image, (25, 25), 0)
         return
 
 
@@ -39,10 +32,12 @@ class mask:
     def __init__(self, image):
         self.height = image.height * 2
         self.width = image.width * 2
-        self.center = (image.width, image.height)
+        self.diffX = 0
+        self.diffY = 0
         self.weight = [[0 for x in range(self.width)]for y in range(self.height)]
         self.generate(image)
 
+    # Generate mask based on given image
     def generate(self, image):
         x0 = image.height
         y0 = image.width
@@ -51,18 +46,26 @@ class mask:
                 self.weight[x][y] = math.exp(-((x-x0)**2+(y-y0)**2)/(image.stdDev**2))
         return
 
+    # Set mask center to image click point
+    def setctr(self, x, y, image):
+        self.diffX = image.height - y
+        self.diffY = image.width - x
+        return
+
+
 def blur(event, x, y, flags, param):
-
     if event == cv2.EVENT_LBUTTONDOWN:
-        print (x, y)
+        img.gaussianfilter()
+        MASK.setctr(x, y, img)
+        for a in range(img.height):
+            for b in range(img.width):
+                img.image[a][b] = MASK.weight[a + MASK.diffX][b + MASK.diffY]*img.filtered[a][b]+(1-MASK.weight[a + MASK.diffX][b + MASK.diffY])*img.image[a][b]
+    return
 
-global img
 img = image("ex1.jpg")
-img.gaussianfilter()
 cv2.namedWindow('image')
 cv2.setMouseCallback('image', blur)
 MASK = mask(img)
-print MASK.weight
 
 while True:
     cv2.imshow('image', img.image)
